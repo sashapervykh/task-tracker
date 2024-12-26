@@ -1,5 +1,6 @@
 .body {
   background-color: #b8e2ff;
+  color: #014779;
 }
 
 .main {
@@ -30,4 +31,17 @@
 
 .bordered {
   border-bottom: 2px solid rgb(1, 71, 121, 0.1);
+}
+
+.add-line {
+  margin: 5px;
+}
+
+.adding-button {
+  margin-left: 10px;
+  font-weight: 600;
+  color: #014779;
+  background-color: #b8e2ff;
+  border-radius: 5px;
+  border: 1px solid #014779;
 }
