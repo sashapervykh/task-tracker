@@ -1,0 +1,9 @@
+.body {
+  background-color: #b8e2ff;
+}
+
+.day-wrapper {
+  width: 300px;
+  height: 600px;
+  border: 2px solid #1582d1;
+}
