@@ -21,8 +21,13 @@ function createAddLine(parent) {
   addingButton.textContent = "ADD";
   addingButton.classList.add("adding-button");
   addLineWrapper.append(addingButton);
+  addLineWrapper.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const task = document.createElement("div");
+    task.textContent = addingInput.value;
+    addingInput.value = "";
+    addLineWrapper.before(task);
+  });
 }
+
 createDay("Mo, 28.02.2024");
-createDay();
-createDay();
-createDay();
