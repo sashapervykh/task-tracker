@@ -31,7 +31,9 @@ function createAddLine(parent) {
 function createTask(sibling, taskText) {
   const task = document.createElement("p");
   const input = document.createElement("input");
+  input.id = "taskText";
   const label = document.createElement("label");
+  label.for = "taskText";
   task.classList.add("bordered", "task");
   input.type = "checkbox";
   label.textContent = taskText;
