@@ -29,6 +29,7 @@ function createAddLine(parent) {
 }
 
 function createTask(sibling, taskText) {
+  if (!taskText) return;
   const task = document.createElement("p");
   const input = document.createElement("input");
   input.id = "taskText";
@@ -42,4 +43,51 @@ function createTask(sibling, taskText) {
   sibling.before(task);
 }
 
-createDay("Mo, 28.02.2024");
+window.addEventListener("load", () => {
+  createDay("Today");
+  createDay("Tomorrow");
+  if (localStorage.getItem("date")) {
+    const prevDate = localStorage.getItem("date");
+    const newDate = new Date();
+    if (prevDate === newDate.getDate() + " " + newDate.getMonth()) {
+      const addLine = document.querySelectorAll(".add-line");
+      if (localStorage.getItem("todayTasks")) {
+        const todayTasks = localStorage.getItem("todayTasks").split(" ");
+        todayTasks.forEach((elem) => {
+          createTask(addLine[0], elem);
+        });
+      }
+      if (localStorage.getItem("tomorrowTasks")) {
+        const tomorrowTasks = localStorage.getItem("tomorrowTasks").split(" ");
+        tomorrowTasks.forEach((elem) => {
+          createTask(addLine[1], elem);
+        });
+      }
+    } else {
+      if (localStorage.getItem("tomorrowTasks")) {
+        const tomorrowTasks = localStorage.getItem("tomorrowTasks").split(" ");
+        tomorrowTasks.forEach((elem) => {
+          createTask(addLine[0], elem);
+        });
+      }
+    }
+  }
+});
+
+window.addEventListener("beforeunload", () => {
+  const today = new Date();
+  localStorage.setItem("date", [today.getDate(), today.getMonth()].join(" ")); // need to check the year as well; think about more clean date for checking
+  const taskWrappers = document.querySelectorAll(".day-wrapper");
+  const todayTasks = [];
+  const tomorrowTasks = [];
+  taskWrappers[0].querySelectorAll(".task").forEach((elem) => {
+    todayTasks.push(elem.textContent);
+  });
+  if (todayTasks.length !== 0)
+    localStorage.setItem("todayTasks", todayTasks.join(" "));
+  taskWrappers[1].querySelectorAll(".task").forEach((elem) => {
+    tomorrowTasks.push(elem.textContent);
+  });
+  if (tomorrowTasks.length !== 0)
+    localStorage.setItem("tomorrowTasks", tomorrowTasks.join(" "));
+});
