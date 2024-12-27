@@ -23,11 +23,21 @@ function createAddLine(parent) {
   addLineWrapper.append(addingButton);
   addLineWrapper.addEventListener("submit", (e) => {
     e.preventDefault();
-    const task = document.createElement("div");
-    task.textContent = addingInput.value;
+    const task = createTask(addLineWrapper, addingInput.value);
     addingInput.value = "";
-    addLineWrapper.before(task);
   });
+}
+
+function createTask(sibling, taskText) {
+  const task = document.createElement("p");
+  const input = document.createElement("input");
+  const label = document.createElement("label");
+  task.classList.add("bordered", "task");
+  input.type = "checkbox";
+  label.textContent = taskText;
+  task.append(input);
+  task.append(label);
+  sibling.before(task);
 }
 
 createDay("Mo, 28.02.2024");

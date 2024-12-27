@@ -4,8 +4,6 @@
 }
 
 .main {
-  display: grid;
-  grid-template-columns: repeat(4, 300px);
   grid-gap: 20px;
   max-width: 1440px;
   margin-right: auto;
@@ -22,9 +20,11 @@
 }
 
 .day-wrapper {
+  margin: 0px auto;
   padding: 10px;
   width: 280px;
-  height: 400px;
+  min-height: 400px;
+  height: fit-content;
   border: 2px solid #014779;
   border-radius: 20px;
 }
@@ -44,4 +44,14 @@
   background-color: #b8e2ff;
   border-radius: 5px;
   border: 1px solid #014779;
+}
+
+.task {
+  display: flex;
+  vertical-align: middle;
+  margin: 0px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 20px;
+  text-transform: capitalize;
 }
