@@ -72,6 +72,10 @@ window.addEventListener("load", () => {
       }
     }
   }
+
+  const day = document.querySelectorAll(".day-wrapper");
+  console.log(day);
+  collectLocalData(day[1]);
 });
 
 window.addEventListener("beforeunload", () => {
@@ -91,3 +95,25 @@ window.addEventListener("beforeunload", () => {
   if (tomorrowTasks.length !== 0)
     localStorage.setItem("tomorrowTasks", tomorrowTasks.join(";"));
 });
+
+function collectLocalData(day) {
+  const tasks = day.querySelectorAll(".task");
+  const tasksDescription = Array.from(tasks).map((elem) => {
+    const taskText = elem.textContent;
+    const taskInput = elem.querySelector("input");
+    const checked = taskInput.checked ? true : false;
+    return [taskText, checked];
+  });
+  return tasksDescription.join(";");
+}
+
+function showLocalData(sibling, localKey) {
+  const localData = localStorage
+    .getItem("localKey")
+    .split(";")
+    .map((elem) => elem.split(","));
+
+  localData.forEach((elem) => {
+    createTask(sibling, elem[0], elem[1]);
+  });
+}
