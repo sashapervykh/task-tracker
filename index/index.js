@@ -52,13 +52,13 @@ window.addEventListener("load", () => {
     if (prevDate === newDate.getDate() + " " + newDate.getMonth()) {
       const addLine = document.querySelectorAll(".add-line");
       if (localStorage.getItem("todayTasks")) {
-        const todayTasks = localStorage.getItem("todayTasks").split(" ");
+        const todayTasks = localStorage.getItem("todayTasks").split(";");
         todayTasks.forEach((elem) => {
           createTask(addLine[0], elem);
         });
       }
       if (localStorage.getItem("tomorrowTasks")) {
-        const tomorrowTasks = localStorage.getItem("tomorrowTasks").split(" ");
+        const tomorrowTasks = localStorage.getItem("tomorrowTasks").split(";");
         tomorrowTasks.forEach((elem) => {
           createTask(addLine[1], elem);
         });
@@ -84,10 +84,10 @@ window.addEventListener("beforeunload", () => {
     todayTasks.push(elem.textContent);
   });
   if (todayTasks.length !== 0)
-    localStorage.setItem("todayTasks", todayTasks.join(" "));
+    localStorage.setItem("todayTasks", todayTasks.join(";"));
   taskWrappers[1].querySelectorAll(".task").forEach((elem) => {
     tomorrowTasks.push(elem.textContent);
   });
   if (tomorrowTasks.length !== 0)
-    localStorage.setItem("tomorrowTasks", tomorrowTasks.join(" "));
+    localStorage.setItem("tomorrowTasks", tomorrowTasks.join(";"));
 });
