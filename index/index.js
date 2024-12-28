@@ -65,7 +65,7 @@ window.addEventListener("load", () => {
       }
     } else {
       if (localStorage.getItem("tomorrowTasks")) {
-        const tomorrowTasks = localStorage.getItem("tomorrowTasks").split(" ");
+        const tomorrowTasks = localStorage.getItem("tomorrowTasks").split(";");
         tomorrowTasks.forEach((elem) => {
           createTask(addLine[0], elem);
         });
