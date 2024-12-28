@@ -28,7 +28,7 @@ function createAddLine(parent) {
   });
 }
 
-function createTask(sibling, taskText) {
+function createTask(sibling, taskText, checked = false) {
   if (!taskText) return;
   const task = document.createElement("p");
   const input = document.createElement("input");
@@ -37,6 +37,7 @@ function createTask(sibling, taskText) {
   label.for = "taskText";
   task.classList.add("bordered", "task");
   input.type = "checkbox";
+  input.checked = checked;
   label.textContent = taskText;
   task.append(input);
   task.append(label);
@@ -52,16 +53,10 @@ window.addEventListener("load", () => {
     if (prevDate === newDate.getDate() + " " + newDate.getMonth()) {
       const addLine = document.querySelectorAll(".add-line");
       if (localStorage.getItem("todayTasks")) {
-        const todayTasks = localStorage.getItem("todayTasks").split(";");
-        todayTasks.forEach((elem) => {
-          createTask(addLine[0], elem);
-        });
+        showLocalData(addLine[0], "todayTasks");
       }
       if (localStorage.getItem("tomorrowTasks")) {
-        const tomorrowTasks = localStorage.getItem("tomorrowTasks").split(";");
-        tomorrowTasks.forEach((elem) => {
-          createTask(addLine[1], elem);
-        });
+        showLocalData(addLine[1], "tomorrowTasks");
       }
     } else {
       if (localStorage.getItem("tomorrowTasks")) {
@@ -72,28 +67,18 @@ window.addEventListener("load", () => {
       }
     }
   }
-
-  const day = document.querySelectorAll(".day-wrapper");
-  console.log(day);
-  collectLocalData(day[1]);
 });
 
 window.addEventListener("beforeunload", () => {
   const today = new Date();
   localStorage.setItem("date", [today.getDate(), today.getMonth()].join(" ")); // need to check the year as well; think about more clean date for checking
   const taskWrappers = document.querySelectorAll(".day-wrapper");
-  const todayTasks = [];
-  const tomorrowTasks = [];
-  taskWrappers[0].querySelectorAll(".task").forEach((elem) => {
-    todayTasks.push(elem.textContent);
-  });
-  if (todayTasks.length !== 0)
-    localStorage.setItem("todayTasks", todayTasks.join(";"));
-  taskWrappers[1].querySelectorAll(".task").forEach((elem) => {
-    tomorrowTasks.push(elem.textContent);
-  });
+  const todayTasks = collectLocalData(taskWrappers[0]);
+  const tomorrowTasks = collectLocalData(taskWrappers[1]);
+  if (todayTasks.length !== 0) localStorage.setItem("todayTasks", todayTasks);
+
   if (tomorrowTasks.length !== 0)
-    localStorage.setItem("tomorrowTasks", tomorrowTasks.join(";"));
+    localStorage.setItem("tomorrowTasks", tomorrowTasks);
 });
 
 function collectLocalData(day) {
@@ -109,9 +94,13 @@ function collectLocalData(day) {
 
 function showLocalData(sibling, localKey) {
   const localData = localStorage
-    .getItem("localKey")
+    .getItem(`${localKey}`)
     .split(";")
-    .map((elem) => elem.split(","));
+    .map((elem) => {
+      const taskData = elem.split(",");
+      taskData[1] = taskData[1] === "true" ? true : false;
+      return taskData;
+    });
 
   localData.forEach((elem) => {
     createTask(sibling, elem[0], elem[1]);
