@@ -15,8 +15,14 @@ module.exports = (env) => {
         template: path.resolve(__dirname, "src", "index.html"),
       }),
     ],
-    optimization: {
-      runtimeChunk: "single",
+
+    module: {
+      rules: [
+        {
+          test: /\.css$/i,
+          use: ["style-loader", "css-loader"],
+        },
+      ],
     },
   };
 };
