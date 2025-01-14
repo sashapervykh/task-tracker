@@ -1,9 +1,21 @@
+/*!*********************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/components/elements/header/header.css ***!
+  \*********************************************************************************************/
+.header {
+  display: flex;
+  font-size: 40px;
+  color: rgb(56, 133, 196);
+  font-weight: bold;
+  justify-content: space-around;
+}
+
 /*!*****************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js!./src/style.css ***!
   \*****************************************************************/
 body {
-  background-color: rgb(149, 156, 90);
-  height: 100vh;
-  width: 100vw;
+  background-color: rgb(248, 230, 208);
+  margin: 0px;
 }
 
+
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibWFpbi5jc3MiLCJtYXBwaW5ncyI6Ijs7O0FBQUE7RUFDRSxhQUFhO0VBQ2IsZUFBZTtFQUNmLHdCQUF3QjtFQUN4QixpQkFBaUI7RUFDakIsNkJBQTZCO0FBQy9COzs7OztBQ05BO0VBQ0Usb0NBQW9DO0VBQ3BDLFdBQVc7QUFDYiIsInNvdXJjZXMiOlsid2VicGFjazovL3Rhc2stdHJhY2tlci8uL3NyYy9jb21wb25lbnRzL2VsZW1lbnRzL2hlYWRlci9oZWFkZXIuY3NzIiwid2VicGFjazovL3Rhc2stdHJhY2tlci8uL3NyYy9zdHlsZS5jc3MiXSwic291cmNlc0NvbnRlbnQiOlsiLmhlYWRlciB7XHJcbiAgZGlzcGxheTogZmxleDtcclxuICBmb250LXNpemU6IDQwcHg7XHJcbiAgY29sb3I6IHJnYig1NiwgMTMzLCAxOTYpO1xyXG4gIGZvbnQtd2VpZ2h0OiBib2xkO1xyXG4gIGp1c3RpZnktY29udGVudDogc3BhY2UtYXJvdW5kO1xyXG59XHJcbiIsImJvZHkge1xyXG4gIGJhY2tncm91bmQtY29sb3I6IHJnYigyNDgsIDIzMCwgMjA4KTtcclxuICBtYXJnaW46IDBweDtcclxufVxyXG4iXSwibmFtZXMiOltdLCJzb3VyY2VSb290IjoiIn0=*/
