@@ -11,6 +11,7 @@ module.exports = (env) => {
       path: path.resolve(__dirname, "dist"),
       clean: true,
     },
+    devtool: "inline-source-map",
     plugins: [
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, "src", "index.html"),
