@@ -11,7 +11,7 @@ export default class Input {
     });
     const button = createElem({ tag: "button", textContent: "CREATE" });
     this.node = createElem({
-      tag: section,
+      tag: "section",
       children: [label, button],
     });
   }
