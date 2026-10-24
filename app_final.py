@@ -1,5 +1,6 @@
 import os
 
+import uvicorn
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -21,3 +22,7 @@ def health() -> dict[str, str]:
 @app.get("/version")
 def version() -> dict[str, str]:
     return {"version": os.getenv("APP_VERSION", "0.1.0")}
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="127.0.0.1", port=int(os.getenv("PORT", "8000")))
