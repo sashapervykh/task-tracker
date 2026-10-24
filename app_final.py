@@ -3,7 +3,7 @@ from datetime import date
 from typing import Literal
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Response
 from pydantic import BaseModel, field_validator
 
 app = FastAPI()
@@ -44,6 +44,13 @@ def clear_tasks() -> None:
     global next_task_id
     tasks.clear()
     next_task_id = 1
+
+
+def find_task(task_id: int) -> Task:
+    task = tasks.get(task_id)
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+    return task
 
 
 @app.get("/")
@@ -103,6 +110,25 @@ def create_task(payload: TaskCreate) -> Task:
     tasks[task.id] = task
     next_task_id += 1
     return task
+
+
+@app.get("/tasks/{task_id}")
+def get_task(task_id: int) -> Task:
+    return find_task(task_id)
+
+
+@app.patch("/tasks/{task_id}")
+def complete_task(task_id: int) -> Task:
+    task = find_task(task_id)
+    task.done = True
+    return task
+
+
+@app.delete("/tasks/{task_id}", status_code=204)
+def delete_task(task_id: int) -> Response:
+    find_task(task_id)
+    del tasks[task_id]
+    return Response(status_code=204)
 
 
 if __name__ == "__main__":

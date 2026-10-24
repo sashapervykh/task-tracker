@@ -147,3 +147,48 @@ def test_unknown_sort_parameters_are_rejected() -> None:
 def test_order_without_sort_by_is_rejected() -> None:
     assert client.get("/tasks", params={"order": "asc"}).status_code == 422
     assert client.get("/tasks", params={"order": "desc"}).status_code == 422
+
+
+def test_get_task_returns_created_task() -> None:
+    client.post(
+        "/tasks",
+        json={"title": "Купить молоко", "priority": "high", "due_date": "2026-10-31"},
+    )
+
+    response = client.get("/tasks/1")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "title": "Купить молоко",
+        "priority": "high",
+        "due_date": "2026-10-31",
+        "done": False,
+    }
+
+
+def test_unknown_task_id_returns_404() -> None:
+    assert client.get("/tasks/999").status_code == 404
+    assert client.patch("/tasks/999").status_code == 404
+    assert client.delete("/tasks/999").status_code == 404
+
+
+def test_patch_marks_task_done() -> None:
+    client.post("/tasks", json={"title": "Купить молоко", "due_date": "2026-10-31"})
+
+    response = client.patch("/tasks/1")
+
+    assert response.status_code == 200
+    assert response.json()["done"] is True
+    assert client.get("/tasks/1").json()["done"] is True
+
+
+def test_delete_removes_task() -> None:
+    client.post("/tasks", json={"title": "Купить молоко", "due_date": "2026-10-31"})
+
+    deleted = client.delete("/tasks/1")
+
+    assert deleted.status_code == 204
+    assert deleted.content == b""
+    assert client.get("/tasks/1").status_code == 404
+    assert client.get("/tasks").json() == []
