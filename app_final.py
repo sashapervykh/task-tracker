@@ -1,12 +1,100 @@
+import logging
 import os
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from datetime import date
+from pathlib import Path
 from typing import Literal
 
 import uvicorn
-from fastapi import FastAPI, HTTPException, Query, Response
+from fastapi import FastAPI, HTTPException, Query, Request, Response
+from fastapi.exception_handlers import (
+    http_exception_handler,
+    request_validation_exception_handler,
+)
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, field_validator
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
-app = FastAPI()
+logger = logging.getLogger("task-tracker")
+
+
+def configure_logging() -> None:
+    configured = os.getenv("LOG_LEVEL")
+    raw_level = (configured if configured is not None else "INFO").strip().upper()
+    known_levels = logging.getLevelNamesMapping()
+    logger.setLevel(known_levels.get(raw_level, logging.INFO))
+    logger.propagate = False
+    if not logger.handlers:
+        formatter = logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s")
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(stream_handler)
+
+        log_dir = Path(__file__).resolve().parent / "logs"
+        log_dir.mkdir(exist_ok=True)
+        file_handler = logging.FileHandler(log_dir / "app.log", encoding="utf-8")
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
+    if raw_level not in known_levels:
+        logger.warning("Неизвестный LOG_LEVEL=%s, используется INFO", configured)
+
+
+def mirror_server_logs_to_file() -> None:
+    file_handler = next(
+        (handler for handler in logger.handlers if isinstance(handler, logging.FileHandler)),
+        None,
+    )
+    if file_handler is None:
+        return
+    for name in ("uvicorn", "uvicorn.access"):
+        server_logger = logging.getLogger(name)
+        if file_handler not in server_logger.handlers:
+            server_logger.addHandler(file_handler)
+
+
+configure_logging()
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    mirror_server_logs_to_file()
+    logger.info("Сервис запущен, версия %s", os.getenv("APP_VERSION", "0.1.0"))
+    yield
+    logger.info("Сервис остановлен")
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def log_http_exception(request: Request, exc: StarletteHTTPException) -> Response:
+    message = "Запрос отклонён: %s %s, статус %s, результат=%s"
+    if exc.status_code >= 500:
+        logger.error(message, request.method, request.url.path, exc.status_code, exc.detail)
+    else:
+        logger.warning(message, request.method, request.url.path, exc.status_code, exc.detail)
+    return await http_exception_handler(request, exc)
+
+
+@app.exception_handler(RequestValidationError)
+async def log_validation_error(request: Request, exc: RequestValidationError) -> JSONResponse:
+    logger.warning(
+        "Ошибка проверки данных: %s %s, результат=%s",
+        request.method,
+        request.url.path,
+        exc.errors(),
+    )
+    return await request_validation_exception_handler(request, exc)
+
+
+@app.exception_handler(Exception)
+async def log_unexpected_error(request: Request, exc: Exception) -> JSONResponse:
+    logger.exception("Необработанная ошибка: %s %s, результат=%s", request.method, request.url.path, exc)
+    return JSONResponse(status_code=500, content={"detail": "Internal Server Error"})
+
 
 Priority = Literal["low", "medium", "high"]
 SortBy = Literal["priority", "due_date"]
@@ -109,6 +197,7 @@ def create_task(payload: TaskCreate) -> Task:
     )
     tasks[task.id] = task
     next_task_id += 1
+    logger.info("Задача создана, id=%s, результат=создана", task.id)
     return task
 
 
@@ -121,6 +210,7 @@ def get_task(task_id: int) -> Task:
 def complete_task(task_id: int) -> Task:
     task = find_task(task_id)
     task.done = True
+    logger.info("Задача отмечена выполненной, id=%s, результат=выполнена", task.id)
     return task
 
 
@@ -128,6 +218,7 @@ def complete_task(task_id: int) -> Task:
 def delete_task(task_id: int) -> Response:
     find_task(task_id)
     del tasks[task_id]
+    logger.info("Задача удалена, id=%s, результат=удалена", task_id)
     return Response(status_code=204)
 
 
