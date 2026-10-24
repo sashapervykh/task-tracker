@@ -183,6 +183,7 @@ def list_tasks(
         selected.sort(key=lambda task: PRIORITY_RANK[task.priority], reverse=order == "desc")
     elif sort_by == "due_date":
         selected.sort(key=lambda task: task.due_date, reverse=order == "desc")
+    logger.info("Запрошен список задач, результат=%s", len(selected))
     return selected
 
 
@@ -203,7 +204,9 @@ def create_task(payload: TaskCreate) -> Task:
 
 @app.get("/tasks/{task_id}")
 def get_task(task_id: int) -> Task:
-    return find_task(task_id)
+    task = find_task(task_id)
+    logger.info("Запрошена задача, id=%s, результат=найдена", task.id)
+    return task
 
 
 @app.patch("/tasks/{task_id}")
